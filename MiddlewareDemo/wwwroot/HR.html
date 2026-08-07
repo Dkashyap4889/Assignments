@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>SignalR Notifications</title>
+</head>
+<body>
+
+    <h1>Real-Time Notifications</h1>
+
+    <ul id="notifications"></ul>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+
+    <script>
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/notificationHub")
+            .build();
+
+        connection.on("NotificationCreated", notification => {
+
+            console.log(notification);
+
+            const li = document.createElement("li");
+
+            li.innerText =
+                `${notification.title} : ${notification.message}`;
+
+            document
+                .getElementById("notifications")
+                .appendChild(li);
+
+        });
+
+        connection.start()
+            .then(() => {
+
+                console.log("Connected");
+
+                return connection.invoke(
+                    "JoinGroup",
+                    "HR");
+
+            })
+            .then(() => {
+
+                console.log("Joined HR");
+
+            });
+
+    </script>
+
+</body>
+</html>
